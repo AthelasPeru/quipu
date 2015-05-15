@@ -8,3 +8,5 @@ def index():
 		'index.html',
         cosas=['RPG', 'Python', 'Juegos de mesa', 'Cthulhu', 'etc']
     )
+
+
