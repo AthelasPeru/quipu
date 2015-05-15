@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% set title ='Titulo bamba' %}
+
+{% block content %}
+	
+	<h4>Esta es una lista de cosas que me gusta</h4>
+	<ul>{% for item in cosas %}
+		<li>{{item}}</li>
+	</ul>
+		{% endfor %}
+
+{% endblock %}
+
+{% block footer %}
+
+{% endblock %}
