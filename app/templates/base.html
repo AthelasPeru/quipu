@@ -1,18 +1,27 @@
 <!DOCTYPE html>
+{% import "foundation/components.html" as components%}
+
 {% if title %}
   {{title}}
 {% else %}
+
   Mi Primera App de Flask
 {% endif %}
-  <nav>
-    <ul>
+  
+{% call components.topbar(class="fixed") %}
+
       <li><a href="#">Link 1</a></li>
       <li><a href="#">Link 2</a></li>
       <li><a href="#">Link 3</a></li>
-    </ul>
-  </nav>
+
+{% endcall %}
+
   {% block content %}
   {% endblock %}
+
+
+
+
 <footer>
   {% block footer %}
 

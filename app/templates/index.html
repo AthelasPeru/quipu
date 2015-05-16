@@ -1,13 +1,27 @@
-{% extends "base.html" %}
+{% extends "foundation/base.html" %}
 {% set title ='Titulo bamba' %}
 
 {% block content %}
 	
-	<h4>Esta es una lista de cosas que me gusta</h4>
-	<ul>{% for item in cosas %}
-		<li>{{item}}</li>
+	<h4>Lista de Usuarios</h4>
+	<ul>
+	{% for user in users %}
+		<li>
+			<strong>User Id:</strong> <span>{{user.id}}</span>
+			<strong>Username:</strong> <span>{{user.username}}</span>
+		</li>
+	{% endfor %}
 	</ul>
-		{% endfor %}
+
+	<h4>Lista de Sesiones</h4>
+	<ul>
+	{% for sesion in sessions %}
+		<li>
+			<strong>Date:</strong> <span>{{sesion.date}}</span>
+			<strong>User Id:</strong> <span>{{sesion.user_id}}</span>
+		</li>
+	{% endfor %}
+	</ul>
 
 {% endblock %}
 
