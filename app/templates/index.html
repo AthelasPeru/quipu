@@ -13,6 +13,31 @@
 	{% endfor %}
 	</ul>
 
+
+	<h4>Lista de Alumnos</h4>
+	<ul>
+	{% for student in students %}
+		<li>
+			<strong>Student Id:</strong> <span>{{student.id}}</span>
+			<strong>Full Name:</strong> <span>{{student.name}} {{student.lastname}}</span>
+			<strong>Code:</strong> <span>{{student.code}}</span>
+			<strong>Tutor:</strong> <span>{{student.tutor}}</span>
+		</li>
+	{% endfor %}
+	</ul>
+
+
+	<h4>Lista de Grupos</h4>
+	<ul>
+	{% for group in groups %}
+		<li>
+			<strong>Group Code:</strong> <span>{{group.code}}</span>
+			<strong>Students:</strong> <span>{{group.students}}</span>
+			<strong>Tutor:</strong> <span>{{group.tutor}}</span>
+		</li>
+	{% endfor %}
+	</ul>
+
 	<h4>Lista de Sesiones</h4>
 	<ul>
 	{% for sesion in sessions %}
@@ -22,6 +47,10 @@
 		</li>
 	{% endfor %}
 	</ul>
+
+
+
+
 
 {% endblock %}
 

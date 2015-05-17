@@ -62,11 +62,13 @@ class Student(db.Model):
 	code = Column(String(255, convert_unicode=True), unique=True)
 	name = Column(String(255, convert_unicode=True))
 	lastname = Column(String(255, convert_unicode=True))
+	tutor = Column(Integer, ForeignKey("users.id"))
 
-	def __init__(self, code, name, lastname):
+	def __init__(self, code, name, lastname, tutor):
 		self.code = code
 		self.name = name
 		self.lastname = lastname
+		self.tutor = tutor
 
 
 	def __repr__(self):
@@ -79,11 +81,16 @@ class Group(db.Model):
 	__tablename__ = "groups"
 
 	id = Column(Integer, primary_key=True)
+	code = Column(String(255, convert_unicode=True), unique=True)
+	students = Column(Integer, ForeignKey("students.id"))
+	tutor = Column(Integer, ForeignKey("users.id"))
 
-	def __init__(sefl):
-		pass
+	def __init__(self, code, studentCode, username): #Creo que esto es una mala idea porque puedo reescribir los tipos basicos. wut
+		self.code = code
+		self.students = studentCode #The problem is that this is going to erase all old data and put the new student.
+		self.tutor = username
 
 	def __repr__(self):
-		return "<this is the group with id = {}>".format(self.id)
+		return "<this is the group with code of = {}>".format(self.code)
 
 
