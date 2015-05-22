@@ -5,10 +5,15 @@ from app.extensions import db
 
 from app.models import User, Session, Student, Group
 
+from flask.ext.migrate import Migrate, MigrateCommand
+
 app = create_app("default")
+
+migrate = Migrate(app, db)
 
 manager = Manager(app)
 
+manager.add_command("db", MigrateCommand)
 
 @manager.shell
 def make_shell_context():

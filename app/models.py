@@ -55,6 +55,7 @@ class Student(db.Model):
 	user_id = Column(Integer, ForeignKey("users.id"))
 	group_id = Column(Integer, ForeignKey("groups.id"))
 	sessions = relationship("Session", order_by="Session.date", backref="student")
+	age = Column(Integer)
 
 	def __init__(self, code, name, lastname, tutor):
 		self.code = code
