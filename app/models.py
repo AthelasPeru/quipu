@@ -23,7 +23,16 @@ class User(db.Model):
 	id = Column(Integer, primary_key=True)
 	stp_id = Column(String(255, convert_unicode=True), unique=True)
 	username = Column(String(25, convert_unicode=True), unique=True)
-	sessions = relationship("Session", order_by="Session.id", backref="user")
+	name = Column(String(25, convert_unicode=True))
+	lastname = Column(String(25, convert_unicode=True))
+	
+	#One to many
+	groups = relationship("Group", order_by="Group.id", backref="tutor")
+	students = relationship("Student", order_by="Student.lastname", backref="tutor")
+
+	# Many to many (Not yet implemented correctly)
+	sessions = relationship("Session", order_by="Session.date", backref="tutor")
+	group_sessions = relationship("GroupSession", order_by="GroupSession.date", backref="tutor")
 
 	def __init__(self, username):
 		self.username = username
@@ -31,25 +40,6 @@ class User(db.Model):
 	def __repr__(self):
 		return "<this is user {}>".format(self.username)
 
-
-
-class Session(db.Model):
-	"""
-	Sesiones relacionadas a un Usuario
-	"""
-	
-	__tablename__ = "sessions"
-
-	id = Column(Integer, primary_key=True)
-	date = Column(String(255, convert_unicode=True))
-	user_id = Column(Integer, ForeignKey("users.id"))
-
-	def __init__(self, date, user_id):
-		self.date = date
-		self.user_id = user_id
-
-	def __repr__(self):
-		return "<this is user {}>".format(self.username)
 
 
 class Student(db.Model):
@@ -62,7 +52,9 @@ class Student(db.Model):
 	code = Column(String(255, convert_unicode=True), unique=True)
 	name = Column(String(255, convert_unicode=True))
 	lastname = Column(String(255, convert_unicode=True))
-	tutor = Column(Integer, ForeignKey("users.id"))
+	user_id = Column(Integer, ForeignKey("users.id"))
+	group_id = Column(Integer, ForeignKey("groups.id"))
+	sessions = relationship("Session", order_by="Session.date", backref="student")
 
 	def __init__(self, code, name, lastname, tutor):
 		self.code = code
@@ -72,7 +64,7 @@ class Student(db.Model):
 
 
 	def __repr__(self):
-		return "<this is {1}{2}, and his student-code is {3}".format(self.name, self.lastname, self.code)
+		return "<this is {0} {1}, and his student-code is {2}>".format(self.name, self.lastname, self.code)
 
 class Group(db.Model):
 	"""
@@ -82,15 +74,62 @@ class Group(db.Model):
 
 	id = Column(Integer, primary_key=True)
 	code = Column(String(255, convert_unicode=True), unique=True)
-	students = Column(Integer, ForeignKey("students.id"))
-	tutor = Column(Integer, ForeignKey("users.id"))
+	students = relationship("Student", order_by="Student.lastname", backref="group")
+	sessions = relationship("GroupSession", order_by="GroupSession.date", backref="group")
+	user_id = Column(Integer, ForeignKey("users.id"))
 
-	def __init__(self, code, studentCode, username): #Creo que esto es una mala idea porque puedo reescribir los tipos basicos. wut
+	def __init__(self, code, tutor, students=[]): 
 		self.code = code
-		self.students = studentCode #The problem is that this is going to erase all old data and put the new student.
-		self.tutor = username
+		self.students = students
+		self.tutor = tutor
 
 	def __repr__(self):
 		return "<this is the group with code of = {}>".format(self.code)
+
+
+
+# Not yet correctly implemented
+class Session(db.Model):
+	"""
+	Sesiones relacionadas a un User y a un Student
+	"""
+	
+	__tablename__ = "sessions"
+
+	id = Column(Integer, primary_key=True)
+	date = Column(String(255, convert_unicode=True))
+	user_id = Column(Integer, ForeignKey("users.id"))
+	student_id = Column(Integer, ForeignKey("students.id"))
+
+
+	def __init__(self, date, tutor, student):
+		self.date = date
+		self.tutor = tutor
+		self.student = student
+
+	def __repr__(self):
+		return "<this is session {}>".format(self.id)
+
+# Not yet correctly implemented
+class GroupSession(db.Model):
+	"""
+	Sesiones relacionadas a un User y a un Group
+	"""
+	
+	__tablename__ = "group_sessions"
+
+	id = Column(Integer, primary_key=True)
+	date = Column(String(255, convert_unicode=True))
+	user_id = Column(Integer, ForeignKey("users.id"))
+	group_id = Column(Integer, ForeignKey("groups.id"))
+
+	def __init__(self, date, tutor, group):
+		self.date = date
+		self.tutor = tutor
+		self.group = group
+
+	def __repr__(self):
+		return "<this is session {}>".format(self.id)
+
 
 

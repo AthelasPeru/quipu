@@ -32,8 +32,14 @@
 	{% for group in groups %}
 		<li>
 			<strong>Group Code:</strong> <span>{{group.code}}</span>
-			<strong>Students:</strong> <span>{{group.students}}</span>
 			<strong>Tutor:</strong> <span>{{group.tutor}}</span>
+			<strong>Students:</strong> 
+				<ul>
+				{% for student in group.students %}
+					<li><span>{{student}}</span></li>
+				{% endfor %}
+				</ul>
+			
 		</li>
 	{% endfor %}
 	</ul>
@@ -43,13 +49,23 @@
 	{% for sesion in sessions %}
 		<li>
 			<strong>Date:</strong> <span>{{sesion.date}}</span>
-			<strong>User Id:</strong> <span>{{sesion.user_id}}</span>
+			<strong>Tutor:</strong> <span>{{sesion.tutor}}</span>
+			<strong>Student:</strong> <span>{{sesion.student}}</span>
 		</li>
 	{% endfor %}
 	</ul>
 
 
-
+	<h4>Lista de Sesiones Grupales</h4>
+	<ul>
+	{% for sesion in groupSessions %}
+		<li>
+			<strong>Date:</strong> <span>{{sesion.date}}</span>
+			<strong>Tutor:</strong> <span>{{sesion.tutor}}</span>
+			<strong>Group:</strong> <span>{{sesion.group}}</span>
+		</li>
+	{% endfor %}
+	</ul>
 
 
 {% endblock %}
