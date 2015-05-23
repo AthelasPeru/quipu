@@ -1,0 +1,38 @@
+.hidden{
+	-webkit-transform: scale(0);
+	   -moz-transform: scale(0);
+	    -ms-transform: scale(0);
+	     -o-transform: scale(0);
+	        transform: scale(0);
+}
+
+
+
+/* Outer Wrapper for the student Form and Buttons */
+.addStudentRow {
+
+}
+
+.addStudentFormButton{
+
+}
+
+.form-wrapper{
+	-webkit-transition: all .55s;
+	   -moz-transition: all .55s;
+	    -ms-transition: all .55s;
+	     -o-transition: all .55s;
+	        transition: all .55s;
+}
+
+.form-wrapper:not(.hidden){
+	-webkit-transform: scale(1);
+	   -moz-transform: scale(1);
+	    -ms-transform: scale(1);
+	     -o-transform: scale(1);
+	        transform: scale(1);
+}
+
+.studentSendButton {
+
+}

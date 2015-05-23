@@ -1,22 +1,16 @@
 {% extends "foundation/base.html" %}
+
 {% set title ='Titulo bamba' %}
 
 {% block content %}
 	
-	<h4>Lista de Usuarios</h4>
-	<ul>
-	{% for user in users %}
-		<li>
-			<strong>User Id:</strong> <span>{{user.id}}</span>
-			<strong>Username:</strong> <span>{{user.username}}</span>
-		</li>
-	{% endfor %}
-	</ul>
+	<h4>Bienvenido <span>{{ user.name }} {{user.lastname}}</span></h4>
+	<h3>Tu correo : <span> {{ user.email }}</span></h3>
 
 
 	<h4>Lista de Alumnos</h4>
 	<ul>
-	{% for student in students %}
+	{% for student in user.students %}
 		<li>
 			<strong>Student Id:</strong> <span>{{student.id}}</span>
 			<strong>Full Name:</strong> <span>{{student.name}} {{student.lastname}}</span>
@@ -26,50 +20,41 @@
 	{% endfor %}
 	</ul>
 
+	<div class="row addStudentRow">
+		<div class="small-12 medium-6 columns">
+			<button id="addStudentFormButton" class="addStudentFormButton">Agregar un Alumno</button>
+		</div>
+		<div id="studentsFormWrapper" class="form-wrapper small-12 medium-6 columns hidden">
+			<form action="/" method="POST">
+				{% with messages = get_flashed_messages(with_categories=true)%}
+					{% if messages%}
+						<ul class="flashes">
+						{% for message in messages %}
+							<li class="{{category}}">{{ message }}</li>
+						{% endfor %}
+						</ul>
+					{% endif%}
+				{% endwith %}
 
-	<h4>Lista de Grupos</h4>
-	<ul>
-	{% for group in groups %}
-		<li>
-			<strong>Group Code:</strong> <span>{{group.code}}</span>
-			<strong>Tutor:</strong> <span>{{group.tutor}}</span>
-			<strong>Students:</strong> 
-				<ul>
-				{% for student in group.students %}
-					<li><span>{{student}}</span></li>
+				{{ form.hidden_tag() }}
+				{% for field in form %}
+					{% if field != form.csrf_token %}
+						{{ field.label}}
+						{{ field(class="form-field", placeholder="Rellena este campo")}}
+					{% endif%}
 				{% endfor %}
-				</ul>
-			
-		</li>
-	{% endfor %}
-	</ul>
-
-	<h4>Lista de Sesiones</h4>
-	<ul>
-	{% for sesion in sessions %}
-		<li>
-			<strong>Date:</strong> <span>{{sesion.date}}</span>
-			<strong>Tutor:</strong> <span>{{sesion.tutor}}</span>
-			<strong>Student:</strong> <span>{{sesion.student}}</span>
-		</li>
-	{% endfor %}
-	</ul>
-
-
-	<h4>Lista de Sesiones Grupales</h4>
-	<ul>
-	{% for sesion in groupSessions %}
-		<li>
-			<strong>Date:</strong> <span>{{sesion.date}}</span>
-			<strong>Tutor:</strong> <span>{{sesion.tutor}}</span>
-			<strong>Group:</strong> <span>{{sesion.group}}</span>
-		</li>
-	{% endfor %}
-	</ul>
-
+				<input type="submit" value="send" class="studentSendButton">
+			</form>		
+		</div>
+	</div>
 
 {% endblock %}
+
 
 {% block footer %}
-
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
+<script src="{{ url_for('static', filename='js/app.js') }}"></script>
 {% endblock %}
+
+
+

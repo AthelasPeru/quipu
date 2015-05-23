@@ -1,104 +1,77 @@
-from flask import render_template, Blueprint, redirect, url_for
+from flask.ext.stormpath import(
+	login_required,
+	StormpathError,
+	login_user,
+	logout_user,
+	user as _user
+)
+
+from flask import(
+	render_template, 
+	Blueprint, 
+	redirect, 
+	url_for,
+	flash
+)
 
 main = Blueprint("main", __name__)
 
 from extensions import db
 from models import User, Session, Student, Group, GroupSession
+from forms import AddStudentForm
 
-@main.route("/")
+
+@main.route("/", methods=["GET", "POST"])
+@login_required
 def index():
-	users = db.session.query(User).all()
-	sessions = db.session.query(Session).all()
-	students = db.session.query(Student).all()
-	groups = db.session.query(Group).all()
-	groupSessions = db.session.query(GroupSession).all()
+
+	#Intentamos revisar si el usuario existe en la base de datos.
+	try:
+		#Buscamos un user cuyo stp_id sea igual que el link del usuario de stormpath que se ha logeado.
+		user = db.session.query(User).filter_by(stp_id=_user.href).first()
+	except:
+		raise ValueError("Problemas con la base de datos")
+	
+	#Si no encontramos un usuario.
+	if not user:
+		
+		#Sacamos el username de su email (Esto hay que cambiarlo o permitirle al ususario cambiarlo)
+		username = _user.email.split("@")[0]
+		
+		#Creamos un nuevo usario con username y stp_id
+		user = User(username=username, stp_id=_user.href, name=_user.given_name, lastname=_user.surname, email=_user.email)
+		
+		#Lo agregamos a la sesion
+		db.session.add(user)
+
+		#Comiteamos la sesion
+		db.session.commit()
+
+	#Ahora importamos nuestro formulario para agregar Students
+	form = AddStudentForm()
+
+	#Si valida el formulario
+	if form.validate_on_submit():
+		#Agregamos los datos necesarios
+		code = form.code.data
+		name = form.name.data
+		lastname = form.lastname.data
+		#Y los usamos para crear un nuevo Student en nuestr BD
+		student = Student(code=code, name=name, lastname=lastname, tutor=user)
+
+		#Luego, metemos ese student en el User ya creado
+		user.students.append(student)
+
+		#Luego, metemos las dos vainasen la BD efectivamente.
+		db.session.add_all([user, student])
+		db.session.commit()
+
+		flash("Your student was added succesfully", "success")
+
+	#Finalmente, el index debe renderizar el template Index.html y mandarle el user y el form.
 	return render_template(
 		"index.html",
-		users=users,
-		sessions=sessions,
-		students=students,
-		groups=groups,
-		groupSessions=groupSessions,
+		user=user,
+		form=form
 	)
-
-@main.route("/addUser/<string:name>")
-def addUser(name):
-	user = User(name)
-	db.session.add(user)
-	db.session.commit()
-	return redirect(url_for("main.index"))
-
-
-@main.route("/addStudent/<string:studentCode>/<string:name>/<string:lastname>/<string:username>")
-def addStudent(studentCode, name, lastname, username):
-	#Parseamos la base de datos para encontrar el usuario (tutor) de este alumno:
-	tutor = db.session.query(User).filter_by(username=username).first()
-
-	#Creamos al nuevo alumno, con el id del usuario (tutor)
-	if tutor: 
-		new_student = Student(studentCode, name, lastname, tutor=tutor)
-		db.session.add(new_student)
-		db.session.commit()
-
-	#Redirect al home, hayamos creado al alumno o no
-	return redirect(url_for("main.index"))
-
-
-@main.route("/addToGroup/<string:groupCode>/<string:studentCode>/<string:username>")
-def addToGroup(groupCode, studentCode, username):
-	#Parseamos la base de datos para encontrar el usuario (tutor) de este alumno:
-	tutor = db.session.query(User).filter_by(username=username).first()
-	student = db.session.query(Student).filter_by(code=studentCode).first()
-	group = db.session.query(Group).filter_by(code=groupCode).first()
-
-	if tutor and student: 
-		if group:
-			#We add the group id to the student info
-			student.group = group  #Aqui estoy llamando al backref definido en Group
-			#We add the student info to the group
-			group.students.append(student)
-			db.session.add_all([group, student])
-		else:
-			new_group = Group(groupCode, tutor=tutor)
-			new_group.students.append(student)
-			db.session.add(new_group)
-		db.session.commit()
-
-	#Redirect al home, hayamos creado al alumno o no
-	return redirect(url_for("main.index"))
-
-
-
-@main.route("/addSession/<string:date>/<string:studentCode>/<string:username>")
-def addSession(date, studentCode, username):
-	#Parseamos la base de datos para encontrar el usuario por su username unico
-	user = db.session.query(User).filter_by(username=username).first()
-	student = db.session.query(Student).filter_by(code=studentCode).first()
-
-	#Creamos la nueva sesion con el id de ese usuario
-	if user:
-		new_session = Session(date, user, student)
-		db.session.add(new_session)
-		db.session.commit()
-	
-	#Redirect al home, hayamos creado la sesion o no.
-	return redirect(url_for("main.index"))
-
-
-
-@main.route("/addGroupSession/<string:date>/<string:groupCode>/<string:username>")
-def addGroupSession(date, groupCode, username):
-	#Parseamos la base de datos para encontrar el usuario por su username unico
-	user = db.session.query(User).filter_by(username=username).first()
-	group = db.session.query(Group).filter_by(code=groupCode).first()
-	
-	#Creamos la nueva sesion con el id de ese usuario
-	if user and group:
-		new_session = GroupSession(date, user, group)
-		db.session.add(new_session)
-		db.session.commit()
-	
-	#Redirect al home, hayamos creado la sesion o no.
-	return redirect(url_for("main.index"))
-
 

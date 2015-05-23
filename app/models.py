@@ -22,9 +22,10 @@ class User(db.Model):
 
 	id = Column(Integer, primary_key=True)
 	stp_id = Column(String(255, convert_unicode=True), unique=True)
-	username = Column(String(25, convert_unicode=True), unique=True)
-	name = Column(String(25, convert_unicode=True))
-	lastname = Column(String(25, convert_unicode=True))
+	username = Column(String(255, convert_unicode=True), unique=True)
+	name = Column(String(255, convert_unicode=True))
+	lastname = Column(String(255, convert_unicode=True))
+	email = Column(String(255, convert_unicode=True))
 	
 	#One to many
 	groups = relationship("Group", order_by="Group.id", backref="tutor")
@@ -34,8 +35,12 @@ class User(db.Model):
 	sessions = relationship("Session", order_by="Session.date", backref="tutor")
 	group_sessions = relationship("GroupSession", order_by="GroupSession.date", backref="tutor")
 
-	def __init__(self, username):
+	def __init__(self, username, stp_id, name, lastname, email):
 		self.username = username
+		self.stp_id = stp_id
+		self.name = name
+		self.lastname = lastname
+		self.email = email
 
 	def __repr__(self):
 		return "<this is user {}>".format(self.username)

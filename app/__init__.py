@@ -1,8 +1,10 @@
+# coding=UTF-8
+
 from flask import Flask
 
 from config import config
 
-from extensions import toolbar, db, foundation
+from extensions import toolbar, db, foundation, stormpath
 
 
 def create_app(config_mode):
@@ -17,6 +19,9 @@ def create_app(config_mode):
 
 	#Permite arrancar foundation varias veces
 	foundation.init_app(app)
+
+	#Inicializamos stormpath para esta instancia de la aplicación
+	stormpath.init_app(app)
 
 	#Importamos las vistas
 	from views import main
